@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import File
 from django.db.models.query import QuerySet
 from PIL import Image
-
 from posts.models import Post
 
 
@@ -149,7 +148,7 @@ class TestPostEditView:
         return File(file_obj, name=name)
 
     @pytest.mark.django_db(transaction=True)
-    def test_post_edit_view_author_post(self, user_client, post_with_group):
+    def test_post_edit_view_author_post(self, mock_media, user_client, post_with_group):
         text = 'Проверка изменения поста!'
         try:
             response = user_client.get(f'/{post_with_group.author.username}/{post_with_group.id}/edit')
@@ -168,7 +167,7 @@ class TestPostEditView:
             'Проверьте, что со страницы `/<username>/<post_id>/edit/` '
             'после создания поста перенаправляете на страницу поста'
         )
-        post = Post.objects.filter(author=post_with_group.author, text=text, group=post_with_group.group).first()
+        post = Post.objects.get(author=post_with_group.author, text=text, group=post_with_group.group)
         assert post is not None, (
             'Проверьте, что вы изминили пост при отправки формы на странице `/<username>/<post_id>/edit/`'
         )
